@@ -25,7 +25,8 @@ while True:
 
 
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
+    face_count = len(faces)
+    
     for (x, y, w, h) in faces:
 
         face_roi = frame[y:y+h, x:x+w]
@@ -42,6 +43,9 @@ while True:
             blurred_face = cv2.GaussianBlur(face_roi, (43, 43), 0)
             frame[y:y+h, x:x+w] = blurred_face
 
+
+    cv2.putText(frame, f"Faces: {face_count}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
+    
     cv2.imshow("Live Face Pixelation", frame)
 
 

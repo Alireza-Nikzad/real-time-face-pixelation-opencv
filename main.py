@@ -1,4 +1,8 @@
 import cv2
+import time 
+
+total_focus_time = 0
+focus_start = None
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
@@ -36,6 +40,25 @@ while True:
 
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
     face_count = len(faces)
+    
+    
+    someone_in_zone = False
+    
+    for (x, y, w, h) in faces:
+        cx = x + w // 2
+        cy = y + h // 2
+        if zone_x1 <= cx <= zone_x2 and zone_y1 <= cy <= zone_y2:
+            someone_in_zone = True
+            break  
+        
+        
+    if someone_in_zone:
+        if focus_start is None:
+            focus_start = time.time()
+    else:
+        if focus_start is not None:
+            total_focus_time += time.time() - focus_start
+            focus_start = None
     
     for i, (x, y, w, h) in enumerate(faces, start= 1):
 
@@ -84,5 +107,19 @@ while True:
         cv2.imwrite(filename, frame)
         print(f"Saved screenshot as {filename}")
         screenshot_count +=1
+        
 cap.release()
+
+
+if focus_start is not None:
+    total_focus_time += time.time() - focus_start
+    
+hours = int(total_focus_time // 3600)
+minutes = int((total_focus_time % 3600) // 60)
+seconds = int(total_focus_time % 60)
+
+
+print(f"\n🎯 Total focused time: {hours}h {minutes}m {seconds}s")
 cv2.destroyAllWindows()
+
+

@@ -30,6 +30,8 @@ while True:
 
         face_roi = frame[y:y+h, x:x+w]
 
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(frame, "Face Detected", (x,y -10), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0,255,0), 2)
         if mode == 'pixelate':
             small = cv2.resize(face_roi, (16, 16), interpolation=cv2.INTER_LINEAR)
             pixelated_face = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)

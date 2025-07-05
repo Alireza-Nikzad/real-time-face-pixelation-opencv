@@ -22,7 +22,15 @@ while True:
     if not ret:
         print("Error: Failed to read frame.")
         break\
-
+            
+    frame_height, frame_width = frame.shape[:2]
+    
+    zone_x1 = int(frame_width * 0.25)
+    zone_x2 = int(frame_width * 0.75)
+    zone_y1 = int(frame_height * 0.25)
+    zone_y2 = int(frame_height * 0.75)
+    
+    
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
@@ -31,20 +39,29 @@ while True:
     
     for i, (x, y, w, h) in enumerate(faces, start= 1):
 
+        cx = x + w // 2
+        cy = y + h // 2
+        
         face_roi = frame[y:y+h, x:x+w]
 
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(frame, f"Face {i}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     0.6, (0, 255, 0), 2)
-        if mode == 'pixelate':
-            small = cv2.resize(face_roi, (16, 16), interpolation=cv2.INTER_LINEAR)
-            pixelated_face = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
-            frame[y:y+h, x:x+w] = pixelated_face
-            
         
-        elif mode == 'blur':
-            blurred_face = cv2.GaussianBlur(face_roi, (43, 43), 0)
-            frame[y:y+h, x:x+w] = blurred_face
+        if zone_x1 <= cx <= zone_x2 and zone_y1 <= cy <= zone_y2:
+            
+            if mode == 'pixelate':
+                small = cv2.resize(face_roi, (16, 16), interpolation=cv2.INTER_LINEAR)
+                pixelated_face = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
+                frame[y:y+h, x:x+w] = pixelated_face
+                
+            
+            elif mode == 'blur':
+                blurred_face = cv2.GaussianBlur(face_roi, (43, 43), 0)
+                frame[y:y+h, x:x+w] = blurred_face
+        else:
+            cv2.putText(frame, f"Outside Zone", (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 
+                0.5, (0, 0, 255), 2)
 
 
     cv2.putText(frame, f"Faces: {face_count}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)

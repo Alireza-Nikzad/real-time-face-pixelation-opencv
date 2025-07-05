@@ -15,6 +15,8 @@ cv2.setWindowProperty("Live Face Pixelation", cv2.WND_PROP_FULLSCREEN, cv2.WINDO
 
 mode = 'pixelate'
 
+screenshot_count = 1
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -59,6 +61,10 @@ while True:
     elif key == ord('b'):
         mode = 'blur'
         print("Switched to blur mode")
-
+    elif key == ord('s'):
+        filename = f"screenshot_{screenshot_count}.png"
+        cv2.imwrite(filename, frame)
+        print(f"Saved screenshot as {filename}")
+        screenshot_count +=1
 cap.release()
 cv2.destroyAllWindows()
